@@ -4,8 +4,13 @@ from typing import Union
 import aiohttp
 from bs4 import BeautifulSoup
 
-from baml_client import b
-from baml_client.types import Message, ContinueResearch, FinalResponse, AskUser
+from baml_client import b, types
+
+# Import types for convenience
+Message = types.Message
+ContinueResearch = types.ContinueResearch
+FinalResponse = types.FinalResponse
+AskUser = types.AskUser
 
 
 MAX_ITERATIONS = 5

@@ -5,6 +5,8 @@ import discord
 from discord.ext import commands
 from discord import ui
 from dotenv import load_dotenv
+import whisper
+import tempfile
 
 from agent import run_agent_loop, continue_after_user_choice, get_channel_memory
 
@@ -13,7 +15,7 @@ load_dotenv()
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama2")
-WHISPER_URL = os.getenv("WHISPER_URL", "http://localhost:9000")
+WHISPER_MODEL = os.getenv("WHISPER_MODEL", "base")
 ALLOWED_CHANNEL_IDS = os.getenv("ALLOWED_CHANNEL_IDS", "")
 
 # Parse allowed channel IDs from comma-separated string
@@ -93,43 +95,22 @@ async def handle_agent_result(channel, original_message, result):
 
 
 async def transcribe_audio(audio_data: bytes, filename: str) -> str:
-    """Send audio to Whisper API and return the transcription."""
-    url = f"{WHISPER_URL}/asr"
-
-    # Prepare multipart form data
-    form_data = aiohttp.FormData()
-    form_data.add_field(
-        'audio_file',
-        audio_data,
-        filename=filename,
-        content_type='audio/ogg'
-    )
-
-    # Common parameters for Whisper ASR APIs
-    form_data.add_field('task', 'transcribe')
-    form_data.add_field('output', 'json')
-
+    """Transcribe audio using local Whisper model."""
     try:
-        async with aiohttp.ClientSession() as session:
-            async with session.post(url, data=form_data, timeout=aiohttp.ClientTimeout(total=120)) as response:
-                if response.status == 200:
-                    content_type = response.headers.get('Content-Type', '')
-                    if 'application/json' in content_type:
-                        data = await response.json()
-                        # Handle different response formats
-                        if isinstance(data, dict):
-                            return data.get("text", data.get("transcription", str(data)))
-                        return str(data)
-                    else:
-                        # Plain text response
-                        return await response.text()
-                else:
-                    error_text = await response.text()
-                    return f"Error from Whisper (status {response.status}): {error_text}"
-    except asyncio.TimeoutError:
-        return "Transcription timed out."
-    except aiohttp.ClientError as e:
-        return f"Connection error to Whisper: {str(e)}"
+        # Write audio data to temporary file
+        with tempfile.NamedTemporaryFile(suffix=os.path.splitext(filename)[1], delete=False) as temp_file:
+            temp_file.write(audio_data)
+            temp_path = temp_file.name
+
+        try:
+            # Run transcription in thread pool to avoid blocking
+            loop = asyncio.get_event_loop()
+            result = await loop.run_in_executor(None, lambda: whisper.load_model(WHISPER_MODEL).transcribe(temp_path))
+            return result["text"].strip()
+        finally:
+            # Clean up temporary file
+            if os.path.exists(temp_path):
+                os.unlink(temp_path)
     except Exception as e:
         return f"Error transcribing audio: {str(e)}"
 
@@ -148,7 +129,7 @@ async def on_ready():
     print(f"Bot is ready! Logged in as {bot.user}")
     print(f"Connected to Ollama at: {OLLAMA_URL}")
     print(f"Using model: {OLLAMA_MODEL}")
-    print(f"Whisper API at: {WHISPER_URL}")
+    print(f"Whisper model: {WHISPER_MODEL} (local)")
     print("Agent mode: ENABLED (BAML structured responses)")
     if allowed_channels:
         print(f"Listening in channels: {allowed_channels}")

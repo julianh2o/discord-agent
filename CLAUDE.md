@@ -52,7 +52,8 @@ User Message → Add to Channel Memory
 discord-agent/
 ├── bot.py              # Discord bot with button UI
 ├── agent.py            # Agent loop and tool execution
-├── requirements.txt    # Python dependencies
+├── pyproject.toml      # Poetry dependencies and config
+├── requirements.txt    # Python dependencies (legacy)
 ├── .env.example        # Environment template
 ├── CLAUDE.md           # This file
 ├── baml_src/           # BAML definitions
@@ -67,11 +68,14 @@ discord-agent/
 
 ### Setup
 ```bash
+# Install Poetry (if not already installed)
+curl -sSL https://install.python-poetry.org | python3 -
+
 # Install dependencies
-pip install -r requirements.txt
+poetry install
 
 # Generate BAML client (run after any .baml changes)
-baml-cli generate
+poetry run baml-cli generate
 
 # Copy and configure environment
 cp .env.example .env
@@ -80,6 +84,11 @@ cp .env.example .env
 
 ### Running
 ```bash
+# Run with Poetry
+poetry run python bot.py
+
+# Or activate the virtual environment and run directly
+poetry shell
 python bot.py
 ```
 
