@@ -19,17 +19,38 @@ type_map = {
     "types.AskUser": types.AskUser,
     "stream_types.AskUser": stream_types.AskUser,
 
-    "types.ContinueResearch": types.ContinueResearch,
-    "stream_types.ContinueResearch": stream_types.ContinueResearch,
+    "types.BashTool": types.BashTool,
+    "stream_types.BashTool": stream_types.BashTool,
 
     "types.FetchUrlTool": types.FetchUrlTool,
     "stream_types.FetchUrlTool": stream_types.FetchUrlTool,
 
-    "types.FinalResponse": types.FinalResponse,
-    "stream_types.FinalResponse": stream_types.FinalResponse,
+    "types.FinalAnswer": types.FinalAnswer,
+    "stream_types.FinalAnswer": stream_types.FinalAnswer,
+
+    "types.GatherInformation": types.GatherInformation,
+    "stream_types.GatherInformation": stream_types.GatherInformation,
+
+    "types.GetOllamaModelsTool": types.GetOllamaModelsTool,
+    "stream_types.GetOllamaModelsTool": stream_types.GetOllamaModelsTool,
+
+    "types.GetStoredContentTool": types.GetStoredContentTool,
+    "stream_types.GetStoredContentTool": stream_types.GetStoredContentTool,
 
     "types.Message": types.Message,
     "stream_types.Message": stream_types.Message,
+
+    "types.PerformAction": types.PerformAction,
+    "stream_types.PerformAction": stream_types.PerformAction,
+
+    "types.ReadFileTool": types.ReadFileTool,
+    "stream_types.ReadFileTool": stream_types.ReadFileTool,
+
+    "types.TavilySearchTool": types.TavilySearchTool,
+    "stream_types.TavilySearchTool": stream_types.TavilySearchTool,
+
+    "types.WriteFileTool": types.WriteFileTool,
+    "stream_types.WriteFileTool": stream_types.WriteFileTool,
 
 
 }

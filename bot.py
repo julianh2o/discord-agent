@@ -8,7 +8,8 @@ from dotenv import load_dotenv
 import whisper
 import tempfile
 
-from agent import run_agent_loop, continue_after_user_choice, get_channel_memory
+from agent import run_agent_loop, continue_after_user_choice, continue_after_tool_approval, get_channel_memory
+from baml_client import b, types
 
 load_dotenv()
 
@@ -80,10 +81,81 @@ class OptionsView(ui.View):
             item.disabled = True
 
 
+class ApprovalButton(ui.Button):
+    """A button for approving or denying tool execution."""
+
+    def __init__(self, label: str, approved: bool, perform_action: types.PerformAction):
+        style = discord.ButtonStyle.success if approved else discord.ButtonStyle.danger
+        super().__init__(
+            label=label,
+            style=style,
+            custom_id=f"approval_{approved}"
+        )
+        self.approved = approved
+        self.perform_action = perform_action
+
+    async def callback(self, interaction: discord.Interaction):
+        # Disable all buttons after selection
+        for item in self.view.children:
+            item.disabled = True
+
+        await interaction.response.edit_message(view=self.view)
+
+        # Show typing indicator and process approval
+        async with interaction.channel.typing():
+            result = await continue_after_tool_approval(
+                interaction.channel.id,
+                self.perform_action,
+                self.approved
+            )
+
+        # Handle the result
+        await handle_agent_result(interaction.channel, interaction.message, result)
+
+
+class ApprovalView(ui.View):
+    """A view containing approval buttons for tool execution."""
+
+    def __init__(self, perform_action: types.PerformAction, timeout: float = 300):
+        super().__init__(timeout=timeout)
+
+        # Add approve button (labeled "1")
+        self.add_item(ApprovalButton("✓ Approve (1)", True, perform_action))
+
+        # Add deny button (labeled "ESC")
+        self.add_item(ApprovalButton("✗ Deny (ESC)", False, perform_action))
+
+    async def on_timeout(self):
+        # Disable all buttons on timeout
+        for item in self.children:
+            item.disabled = True
+
+
+def format_tool_calls_for_approval(tool_calls: list) -> str:
+    """Format tool calls for user approval message."""
+    lines = []
+    for i, tool_call in enumerate(tool_calls, 1):
+        if hasattr(tool_call, 'file_path') and hasattr(tool_call, 'content'):  # WriteFileTool
+            content_preview = tool_call.content[:100] + "..." if len(tool_call.content) > 100 else tool_call.content
+            lines.append(f"{i}. **Write File**: `{tool_call.file_path}`")
+            lines.append(f"   Reason: {tool_call.reason}")
+            lines.append(f"   Content: ```\n{content_preview}\n```")
+        elif hasattr(tool_call, 'file_path'):  # ReadFileTool
+            lines.append(f"{i}. **Read File**: `{tool_call.file_path}`")
+            lines.append(f"   Reason: {tool_call.reason}")
+        elif hasattr(tool_call, 'command'):  # BashTool
+            lines.append(f"{i}. **Run Command**: `{tool_call.command}`")
+            lines.append(f"   Reason: {tool_call.reason}")
+    return "\n".join(lines)
+
+
 async def handle_agent_result(channel, original_message, result):
     """Handle the result from the agent loop."""
     if result.error:
-        await channel.send(f"Error: {result.error}")
+        error_msg = f"Error: {result.error}"
+        # Summarize if too long
+        error_msg = await maybe_summarize_text(error_msg, 1900)
+        await channel.send(error_msg)
 
     elif result.response:
         await send_response(channel, result.response)
@@ -92,6 +164,20 @@ async def handle_agent_result(channel, original_message, result):
         # Create button view for options
         view = OptionsView(result.ask_user.options)
         await channel.send(result.ask_user.question, view=view)
+
+    elif result.perform_action:
+        # Handle PerformAction - show approval UI
+        reasoning = result.perform_action.reasoning
+        tools_formatted = format_tool_calls_for_approval(result.perform_action.tool_calls)
+
+        approval_msg = f"**🔧 Tool Approval Required**\n\n"
+        approval_msg += f"**Reasoning:** {reasoning}\n\n"
+        approval_msg += f"**Proposed Actions:**\n{tools_formatted}\n\n"
+        approval_msg += "Click **✓ Approve** to execute or **✗ Deny** to cancel."
+
+        # Create approval view
+        view = ApprovalView(result.perform_action)
+        await channel.send(approval_msg, view=view)
 
 
 async def transcribe_audio(audio_data: bytes, filename: str) -> str:
@@ -137,14 +223,38 @@ async def on_ready():
         print("Warning: No ALLOWED_CHANNEL_IDS set. Bot will respond in ALL channels!")
 
 
+async def maybe_summarize_text(text: str, max_length: int = 1900) -> str:
+    """Summarize text if it exceeds the maximum length using BAML."""
+    if len(text) <= max_length:
+        return text
+
+    # Calculate target length with some margin
+    target_length = int(max_length * 0.9)  # 90% of max to have margin
+
+    try:
+        # Use BAML to summarize
+        summarized = await b.SummarizeText(text, target_length)
+
+        # If summarization still exceeds max, truncate
+        if len(summarized) > max_length:
+            summarized = summarized[:max_length - 3] + "..."
+
+        return summarized
+    except Exception as e:
+        # Fallback to simple truncation if summarization fails
+        print(f"Summarization failed: {e}")
+        return text[:max_length - 3] + "..."
+
+
 async def send_response(channel, response: str):
-    """Send a response to a channel, splitting into chunks if necessary."""
-    if len(response) <= 2000:
+    """Send a response to a channel, summarizing if necessary."""
+    # Discord limit is 2000 chars, use 1900 to be safe
+    if len(response) <= 1900:
         await channel.send(response)
     else:
-        chunks = [response[i:i+1990] for i in range(0, len(response), 1990)]
-        for chunk in chunks:
-            await channel.send(chunk)
+        # Try to summarize instead of chunking
+        summarized = await maybe_summarize_text(response, 1900)
+        await channel.send(summarized)
 
 
 def is_voice_message(message: discord.Message) -> bool:

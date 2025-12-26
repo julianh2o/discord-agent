@@ -16,27 +16,39 @@ A Discord bot that relays messages (text and voice) to a Llama AI instance via a
 ```
 User Message → Add to Channel Memory
                     ↓
-              AgentStep(messages)
+              AgentStep(messages) [Orchestrator]
                     ↓
-         ┌─────────┴─────────┐
-         ↓                   ↓                   ↓
-   ContinueResearch    FinalResponse         AskUser
-         ↓                   ↓                   ↓
-   Execute URL fetch   Send response      Send buttons
-   Add results           Done            Wait for click
-   Loop again                            Add choice
-                                         Loop again
+    ┌───────────────┼───────────────┬─────────────┐
+    ↓               ↓               ↓             ↓
+GatherInformation  AskUser    PerformAction  FinalAnswer
+    ↓               ↓               ↓             ↓
+Execute tools  Send buttons   Execute action  Send response
+Add results    Wait for click     (TODO)         Done
+Loop again     Add choice
+               Loop again
 ```
 
-### BAML Types
+### BAML Types - Orchestrator Actions
 
-**Agent Actions** (union type - agent chooses one):
-- `ContinueResearch`: Fetch URLs for more information
-- `FinalResponse`: Send final answer to user
-- `AskUser`: Ask clarifying question with button options
+The orchestrator analyzes conversation context and chooses one of 4 actions:
 
-**Tools**:
-- `FetchUrlTool`: Fetch and extract text content from URLs
+1. **GatherInformation**: Collect data using available tools
+   - FetchUrlTool: Fetch and extract web content
+   - TavilySearchTool: Search the web
+   - GetOllamaModelsTool: List available AI models
+   - GetStoredContentTool: Retrieve stored content by SHA key
+
+2. **AskUser**: Request clarification with 2-4 button options
+   - Used when user intent is ambiguous
+   - Provides multiple choice options via Discord buttons
+
+3. **PerformAction**: Execute a specific action
+   - For operations beyond gathering info or responding
+   - Action execution framework (extensible)
+
+4. **FinalAnswer**: Provide complete response to user
+   - Used when sufficient information is available
+   - Includes reasoning and final response
 
 ## Configuration
 

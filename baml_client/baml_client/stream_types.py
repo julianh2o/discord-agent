@@ -23,27 +23,57 @@ class StreamState(BaseModel, typing.Generic[StreamStateValueT]):
     value: StreamStateValueT
     state: typing_extensions.Literal["Pending", "Incomplete", "Complete"]
 # #########################################################################
-# Generated classes (5)
+# Generated classes (12)
 # #########################################################################
 
 class AskUser(BaseModel):
+    reasoning: typing.Optional[str] = None
     question: typing.Optional[str] = None
     options: typing.List[str]
 
-class ContinueResearch(BaseModel):
-    reasoning: typing.Optional[str] = None
-    tool_calls: typing.List["FetchUrlTool"]
+class BashTool(BaseModel):
+    command: typing.Optional[str] = None
+    reason: typing.Optional[str] = None
 
 class FetchUrlTool(BaseModel):
     url: typing.Optional[str] = None
     reason: typing.Optional[str] = None
 
-class FinalResponse(BaseModel):
+class FinalAnswer(BaseModel):
+    reasoning: typing.Optional[str] = None
     response: typing.Optional[str] = None
 
+class GatherInformation(BaseModel):
+    reasoning: typing.Optional[str] = None
+    tool_calls: typing.List[typing.Union["FetchUrlTool", "GetOllamaModelsTool", "GetStoredContentTool", "TavilySearchTool"]]
+
+class GetOllamaModelsTool(BaseModel):
+    reason: typing.Optional[str] = None
+
+class GetStoredContentTool(BaseModel):
+    sha_key: typing.Optional[str] = None
+    reason: typing.Optional[str] = None
+
 class Message(BaseModel):
-    role: typing.Optional[typing.Union[typing_extensions.Literal['user'], typing_extensions.Literal['assistant'], typing_extensions.Literal['tool']]] = None
+    role: typing.Optional[typing.Union[typing_extensions.Literal['user'], typing_extensions.Literal['assistant'], typing_extensions.Literal['tool'], typing_extensions.Literal['error']]] = None
     content: typing.Optional[str] = None
+
+class PerformAction(BaseModel):
+    reasoning: typing.Optional[str] = None
+    tool_calls: typing.List[typing.Union["ReadFileTool", "WriteFileTool", "BashTool"]]
+
+class ReadFileTool(BaseModel):
+    file_path: typing.Optional[str] = None
+    reason: typing.Optional[str] = None
+
+class TavilySearchTool(BaseModel):
+    query: typing.Optional[str] = None
+    reason: typing.Optional[str] = None
+
+class WriteFileTool(BaseModel):
+    file_path: typing.Optional[str] = None
+    content: typing.Optional[str] = None
+    reason: typing.Optional[str] = None
 
 # #########################################################################
 # Generated type aliases (0)

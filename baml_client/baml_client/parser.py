@@ -26,9 +26,15 @@ class LlmResponseParser:
 
     def AgentStep(
         self, llm_response: str, baml_options: BamlCallOptions = {},
-    ) -> typing.Union["types.ContinueResearch", "types.FinalResponse", "types.AskUser"]:
+    ) -> typing.Union["types.GatherInformation", "types.PerformAction", "types.FinalAnswer"]:
         __result__ = self.__options.merge_options(baml_options).parse_response(function_name="AgentStep", llm_response=llm_response, mode="request")
-        return typing.cast(typing.Union["types.ContinueResearch", "types.FinalResponse", "types.AskUser"], __result__)
+        return typing.cast(typing.Union["types.GatherInformation", "types.PerformAction", "types.FinalAnswer"], __result__)
+
+    def SummarizeText(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> str:
+        __result__ = self.__options.merge_options(baml_options).parse_response(function_name="SummarizeText", llm_response=llm_response, mode="request")
+        return typing.cast(str, __result__)
 
     
 
@@ -40,8 +46,14 @@ class LlmStreamParser:
 
     def AgentStep(
         self, llm_response: str, baml_options: BamlCallOptions = {},
-    ) -> typing.Union["stream_types.ContinueResearch", "stream_types.FinalResponse", "stream_types.AskUser"]:
+    ) -> typing.Union["stream_types.GatherInformation", "stream_types.PerformAction", "stream_types.FinalAnswer"]:
         __result__ = self.__options.merge_options(baml_options).parse_response(function_name="AgentStep", llm_response=llm_response, mode="stream")
-        return typing.cast(typing.Union["stream_types.ContinueResearch", "stream_types.FinalResponse", "stream_types.AskUser"], __result__)
+        return typing.cast(typing.Union["stream_types.GatherInformation", "stream_types.PerformAction", "stream_types.FinalAnswer"], __result__)
+
+    def SummarizeText(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> str:
+        __result__ = self.__options.merge_options(baml_options).parse_response(function_name="SummarizeText", llm_response=llm_response, mode="stream")
+        return typing.cast(str, __result__)
 
     

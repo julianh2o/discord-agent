@@ -41,27 +41,57 @@ def all_succeeded(checks: typing.Dict[CheckName, Check]) -> bool:
 # #########################################################################
 
 # #########################################################################
-# Generated classes (5)
+# Generated classes (12)
 # #########################################################################
 
 class AskUser(BaseModel):
+    reasoning: str
     question: str
     options: typing.List[str]
 
-class ContinueResearch(BaseModel):
-    reasoning: str
-    tool_calls: typing.List["FetchUrlTool"]
+class BashTool(BaseModel):
+    command: str
+    reason: str
 
 class FetchUrlTool(BaseModel):
     url: str
     reason: str
 
-class FinalResponse(BaseModel):
+class FinalAnswer(BaseModel):
+    reasoning: str
     response: str
 
+class GatherInformation(BaseModel):
+    reasoning: str
+    tool_calls: typing.List[typing.Union["FetchUrlTool", "GetOllamaModelsTool", "GetStoredContentTool", "TavilySearchTool"]]
+
+class GetOllamaModelsTool(BaseModel):
+    reason: str
+
+class GetStoredContentTool(BaseModel):
+    sha_key: str
+    reason: str
+
 class Message(BaseModel):
-    role: typing.Union[typing_extensions.Literal['user'], typing_extensions.Literal['assistant'], typing_extensions.Literal['tool']]
+    role: typing.Union[typing_extensions.Literal['user'], typing_extensions.Literal['assistant'], typing_extensions.Literal['tool'], typing_extensions.Literal['error']]
     content: str
+
+class PerformAction(BaseModel):
+    reasoning: str
+    tool_calls: typing.List[typing.Union["ReadFileTool", "WriteFileTool", "BashTool"]]
+
+class ReadFileTool(BaseModel):
+    file_path: str
+    reason: str
+
+class TavilySearchTool(BaseModel):
+    query: str
+    reason: str
+
+class WriteFileTool(BaseModel):
+    file_path: str
+    content: str
+    reason: str
 
 # #########################################################################
 # Generated type aliases (0)

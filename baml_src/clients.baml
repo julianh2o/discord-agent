@@ -1,8 +1,17 @@
-client<llm> Ollama {
+client<llm> OrchestratorModel {
   provider openai
   options {
     base_url env.OLLAMA_URL
-    api_key "ollama" // Ollama doesn't require a real API key
-    model env.OLLAMA_MODEL
+    model "llama3.1:8b"
+    num_ctx 32768
+  }
+}
+
+// Fast, small model for summarization tasks
+client<llm> SummarizationModel {
+  provider openai
+  options {
+    base_url env.OLLAMA_URL
+    model "qwen3:4b"
   }
 }

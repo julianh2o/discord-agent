@@ -20,7 +20,7 @@ from .globals import DO_NOT_USE_DIRECTLY_UNLESS_YOU_KNOW_WHAT_YOURE_DOING_RUNTIM
 class TypeBuilder(type_builder.TypeBuilder):
     def __init__(self):
         super().__init__(classes=set(
-          ["AskUser","ContinueResearch","FetchUrlTool","FinalResponse","Message",]
+          ["AskUser","BashTool","FetchUrlTool","FinalAnswer","GatherInformation","GetOllamaModelsTool","GetStoredContentTool","Message","PerformAction","ReadFileTool","TavilySearchTool","WriteFileTool",]
         ), enums=set(
           []
         ), runtime=DO_NOT_USE_DIRECTLY_UNLESS_YOU_KNOW_WHAT_YOURE_DOING_RUNTIME)
@@ -31,7 +31,7 @@ class TypeBuilder(type_builder.TypeBuilder):
 
 
     # #########################################################################
-    # Generated classes 5
+    # Generated classes 12
     # #########################################################################
 
     @property
@@ -39,20 +39,48 @@ class TypeBuilder(type_builder.TypeBuilder):
         return AskUserViewer(self)
 
     @property
-    def ContinueResearch(self) -> "ContinueResearchViewer":
-        return ContinueResearchViewer(self)
+    def BashTool(self) -> "BashToolViewer":
+        return BashToolViewer(self)
 
     @property
     def FetchUrlTool(self) -> "FetchUrlToolViewer":
         return FetchUrlToolViewer(self)
 
     @property
-    def FinalResponse(self) -> "FinalResponseViewer":
-        return FinalResponseViewer(self)
+    def FinalAnswer(self) -> "FinalAnswerViewer":
+        return FinalAnswerViewer(self)
+
+    @property
+    def GatherInformation(self) -> "GatherInformationViewer":
+        return GatherInformationViewer(self)
+
+    @property
+    def GetOllamaModelsTool(self) -> "GetOllamaModelsToolViewer":
+        return GetOllamaModelsToolViewer(self)
+
+    @property
+    def GetStoredContentTool(self) -> "GetStoredContentToolViewer":
+        return GetStoredContentToolViewer(self)
 
     @property
     def Message(self) -> "MessageViewer":
         return MessageViewer(self)
+
+    @property
+    def PerformAction(self) -> "PerformActionViewer":
+        return PerformActionViewer(self)
+
+    @property
+    def ReadFileTool(self) -> "ReadFileToolViewer":
+        return ReadFileToolViewer(self)
+
+    @property
+    def TavilySearchTool(self) -> "TavilySearchToolViewer":
+        return TavilySearchToolViewer(self)
+
+    @property
+    def WriteFileTool(self) -> "WriteFileToolViewer":
+        return WriteFileToolViewer(self)
 
 
 
@@ -62,14 +90,14 @@ class TypeBuilder(type_builder.TypeBuilder):
 
 
 # #########################################################################
-# Generated classes 5
+# Generated classes 12
 # #########################################################################
 
 class AskUserAst:
     def __init__(self, tb: type_builder.TypeBuilder):
         _tb = tb._tb # type: ignore (we know how to use this private attribute)
         self._bldr = _tb.class_("AskUser")
-        self._properties: typing.Set[str] = set([  "question",  "options",  ])
+        self._properties: typing.Set[str] = set([  "reasoning",  "question",  "options",  ])
         self._props = AskUserProperties(self._bldr, self._properties)
 
     def type(self) -> baml_py.FieldType:
@@ -98,6 +126,10 @@ class AskUserProperties:
     
     
     @property
+    def reasoning(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("reasoning"))
+    
+    @property
     def question(self) -> type_builder.ClassPropertyViewer:
         return type_builder.ClassPropertyViewer(self.__bldr.property("question"))
     
@@ -108,22 +140,22 @@ class AskUserProperties:
     
 
 
-class ContinueResearchAst:
+class BashToolAst:
     def __init__(self, tb: type_builder.TypeBuilder):
         _tb = tb._tb # type: ignore (we know how to use this private attribute)
-        self._bldr = _tb.class_("ContinueResearch")
-        self._properties: typing.Set[str] = set([  "reasoning",  "tool_calls",  ])
-        self._props = ContinueResearchProperties(self._bldr, self._properties)
+        self._bldr = _tb.class_("BashTool")
+        self._properties: typing.Set[str] = set([  "command",  "reason",  ])
+        self._props = BashToolProperties(self._bldr, self._properties)
 
     def type(self) -> baml_py.FieldType:
         return self._bldr.field()
 
     @property
-    def props(self) -> "ContinueResearchProperties":
+    def props(self) -> "BashToolProperties":
         return self._props
 
 
-class ContinueResearchViewer(ContinueResearchAst):
+class BashToolViewer(BashToolAst):
     def __init__(self, tb: type_builder.TypeBuilder):
         super().__init__(tb)
 
@@ -133,7 +165,7 @@ class ContinueResearchViewer(ContinueResearchAst):
     
 
 
-class ContinueResearchProperties:
+class BashToolProperties:
     def __init__(self, bldr: baml_py.ClassBuilder, properties: typing.Set[str]):
         self.__bldr = bldr
         self.__properties = properties # type: ignore (we know how to use this private attribute) # noqa: F821
@@ -141,12 +173,12 @@ class ContinueResearchProperties:
     
     
     @property
-    def reasoning(self) -> type_builder.ClassPropertyViewer:
-        return type_builder.ClassPropertyViewer(self.__bldr.property("reasoning"))
+    def command(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("command"))
     
     @property
-    def tool_calls(self) -> type_builder.ClassPropertyViewer:
-        return type_builder.ClassPropertyViewer(self.__bldr.property("tool_calls"))
+    def reason(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("reason"))
     
     
 
@@ -194,22 +226,22 @@ class FetchUrlToolProperties:
     
 
 
-class FinalResponseAst:
+class FinalAnswerAst:
     def __init__(self, tb: type_builder.TypeBuilder):
         _tb = tb._tb # type: ignore (we know how to use this private attribute)
-        self._bldr = _tb.class_("FinalResponse")
-        self._properties: typing.Set[str] = set([  "response",  ])
-        self._props = FinalResponseProperties(self._bldr, self._properties)
+        self._bldr = _tb.class_("FinalAnswer")
+        self._properties: typing.Set[str] = set([  "reasoning",  "response",  ])
+        self._props = FinalAnswerProperties(self._bldr, self._properties)
 
     def type(self) -> baml_py.FieldType:
         return self._bldr.field()
 
     @property
-    def props(self) -> "FinalResponseProperties":
+    def props(self) -> "FinalAnswerProperties":
         return self._props
 
 
-class FinalResponseViewer(FinalResponseAst):
+class FinalAnswerViewer(FinalAnswerAst):
     def __init__(self, tb: type_builder.TypeBuilder):
         super().__init__(tb)
 
@@ -219,7 +251,7 @@ class FinalResponseViewer(FinalResponseAst):
     
 
 
-class FinalResponseProperties:
+class FinalAnswerProperties:
     def __init__(self, bldr: baml_py.ClassBuilder, properties: typing.Set[str]):
         self.__bldr = bldr
         self.__properties = properties # type: ignore (we know how to use this private attribute) # noqa: F821
@@ -227,8 +259,137 @@ class FinalResponseProperties:
     
     
     @property
+    def reasoning(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("reasoning"))
+    
+    @property
     def response(self) -> type_builder.ClassPropertyViewer:
         return type_builder.ClassPropertyViewer(self.__bldr.property("response"))
+    
+    
+
+
+class GatherInformationAst:
+    def __init__(self, tb: type_builder.TypeBuilder):
+        _tb = tb._tb # type: ignore (we know how to use this private attribute)
+        self._bldr = _tb.class_("GatherInformation")
+        self._properties: typing.Set[str] = set([  "reasoning",  "tool_calls",  ])
+        self._props = GatherInformationProperties(self._bldr, self._properties)
+
+    def type(self) -> baml_py.FieldType:
+        return self._bldr.field()
+
+    @property
+    def props(self) -> "GatherInformationProperties":
+        return self._props
+
+
+class GatherInformationViewer(GatherInformationAst):
+    def __init__(self, tb: type_builder.TypeBuilder):
+        super().__init__(tb)
+
+    
+    def list_properties(self) -> typing.List[typing.Tuple[str, type_builder.ClassPropertyViewer]]:
+        return [(name, type_builder.ClassPropertyViewer(self._bldr.property(name))) for name in self._properties]
+    
+
+
+class GatherInformationProperties:
+    def __init__(self, bldr: baml_py.ClassBuilder, properties: typing.Set[str]):
+        self.__bldr = bldr
+        self.__properties = properties # type: ignore (we know how to use this private attribute) # noqa: F821
+
+    
+    
+    @property
+    def reasoning(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("reasoning"))
+    
+    @property
+    def tool_calls(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("tool_calls"))
+    
+    
+
+
+class GetOllamaModelsToolAst:
+    def __init__(self, tb: type_builder.TypeBuilder):
+        _tb = tb._tb # type: ignore (we know how to use this private attribute)
+        self._bldr = _tb.class_("GetOllamaModelsTool")
+        self._properties: typing.Set[str] = set([  "reason",  ])
+        self._props = GetOllamaModelsToolProperties(self._bldr, self._properties)
+
+    def type(self) -> baml_py.FieldType:
+        return self._bldr.field()
+
+    @property
+    def props(self) -> "GetOllamaModelsToolProperties":
+        return self._props
+
+
+class GetOllamaModelsToolViewer(GetOllamaModelsToolAst):
+    def __init__(self, tb: type_builder.TypeBuilder):
+        super().__init__(tb)
+
+    
+    def list_properties(self) -> typing.List[typing.Tuple[str, type_builder.ClassPropertyViewer]]:
+        return [(name, type_builder.ClassPropertyViewer(self._bldr.property(name))) for name in self._properties]
+    
+
+
+class GetOllamaModelsToolProperties:
+    def __init__(self, bldr: baml_py.ClassBuilder, properties: typing.Set[str]):
+        self.__bldr = bldr
+        self.__properties = properties # type: ignore (we know how to use this private attribute) # noqa: F821
+
+    
+    
+    @property
+    def reason(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("reason"))
+    
+    
+
+
+class GetStoredContentToolAst:
+    def __init__(self, tb: type_builder.TypeBuilder):
+        _tb = tb._tb # type: ignore (we know how to use this private attribute)
+        self._bldr = _tb.class_("GetStoredContentTool")
+        self._properties: typing.Set[str] = set([  "sha_key",  "reason",  ])
+        self._props = GetStoredContentToolProperties(self._bldr, self._properties)
+
+    def type(self) -> baml_py.FieldType:
+        return self._bldr.field()
+
+    @property
+    def props(self) -> "GetStoredContentToolProperties":
+        return self._props
+
+
+class GetStoredContentToolViewer(GetStoredContentToolAst):
+    def __init__(self, tb: type_builder.TypeBuilder):
+        super().__init__(tb)
+
+    
+    def list_properties(self) -> typing.List[typing.Tuple[str, type_builder.ClassPropertyViewer]]:
+        return [(name, type_builder.ClassPropertyViewer(self._bldr.property(name))) for name in self._properties]
+    
+
+
+class GetStoredContentToolProperties:
+    def __init__(self, bldr: baml_py.ClassBuilder, properties: typing.Set[str]):
+        self.__bldr = bldr
+        self.__properties = properties # type: ignore (we know how to use this private attribute) # noqa: F821
+
+    
+    
+    @property
+    def sha_key(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("sha_key"))
+    
+    @property
+    def reason(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("reason"))
     
     
 
@@ -272,6 +433,182 @@ class MessageProperties:
     @property
     def content(self) -> type_builder.ClassPropertyViewer:
         return type_builder.ClassPropertyViewer(self.__bldr.property("content"))
+    
+    
+
+
+class PerformActionAst:
+    def __init__(self, tb: type_builder.TypeBuilder):
+        _tb = tb._tb # type: ignore (we know how to use this private attribute)
+        self._bldr = _tb.class_("PerformAction")
+        self._properties: typing.Set[str] = set([  "reasoning",  "tool_calls",  ])
+        self._props = PerformActionProperties(self._bldr, self._properties)
+
+    def type(self) -> baml_py.FieldType:
+        return self._bldr.field()
+
+    @property
+    def props(self) -> "PerformActionProperties":
+        return self._props
+
+
+class PerformActionViewer(PerformActionAst):
+    def __init__(self, tb: type_builder.TypeBuilder):
+        super().__init__(tb)
+
+    
+    def list_properties(self) -> typing.List[typing.Tuple[str, type_builder.ClassPropertyViewer]]:
+        return [(name, type_builder.ClassPropertyViewer(self._bldr.property(name))) for name in self._properties]
+    
+
+
+class PerformActionProperties:
+    def __init__(self, bldr: baml_py.ClassBuilder, properties: typing.Set[str]):
+        self.__bldr = bldr
+        self.__properties = properties # type: ignore (we know how to use this private attribute) # noqa: F821
+
+    
+    
+    @property
+    def reasoning(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("reasoning"))
+    
+    @property
+    def tool_calls(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("tool_calls"))
+    
+    
+
+
+class ReadFileToolAst:
+    def __init__(self, tb: type_builder.TypeBuilder):
+        _tb = tb._tb # type: ignore (we know how to use this private attribute)
+        self._bldr = _tb.class_("ReadFileTool")
+        self._properties: typing.Set[str] = set([  "file_path",  "reason",  ])
+        self._props = ReadFileToolProperties(self._bldr, self._properties)
+
+    def type(self) -> baml_py.FieldType:
+        return self._bldr.field()
+
+    @property
+    def props(self) -> "ReadFileToolProperties":
+        return self._props
+
+
+class ReadFileToolViewer(ReadFileToolAst):
+    def __init__(self, tb: type_builder.TypeBuilder):
+        super().__init__(tb)
+
+    
+    def list_properties(self) -> typing.List[typing.Tuple[str, type_builder.ClassPropertyViewer]]:
+        return [(name, type_builder.ClassPropertyViewer(self._bldr.property(name))) for name in self._properties]
+    
+
+
+class ReadFileToolProperties:
+    def __init__(self, bldr: baml_py.ClassBuilder, properties: typing.Set[str]):
+        self.__bldr = bldr
+        self.__properties = properties # type: ignore (we know how to use this private attribute) # noqa: F821
+
+    
+    
+    @property
+    def file_path(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("file_path"))
+    
+    @property
+    def reason(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("reason"))
+    
+    
+
+
+class TavilySearchToolAst:
+    def __init__(self, tb: type_builder.TypeBuilder):
+        _tb = tb._tb # type: ignore (we know how to use this private attribute)
+        self._bldr = _tb.class_("TavilySearchTool")
+        self._properties: typing.Set[str] = set([  "query",  "reason",  ])
+        self._props = TavilySearchToolProperties(self._bldr, self._properties)
+
+    def type(self) -> baml_py.FieldType:
+        return self._bldr.field()
+
+    @property
+    def props(self) -> "TavilySearchToolProperties":
+        return self._props
+
+
+class TavilySearchToolViewer(TavilySearchToolAst):
+    def __init__(self, tb: type_builder.TypeBuilder):
+        super().__init__(tb)
+
+    
+    def list_properties(self) -> typing.List[typing.Tuple[str, type_builder.ClassPropertyViewer]]:
+        return [(name, type_builder.ClassPropertyViewer(self._bldr.property(name))) for name in self._properties]
+    
+
+
+class TavilySearchToolProperties:
+    def __init__(self, bldr: baml_py.ClassBuilder, properties: typing.Set[str]):
+        self.__bldr = bldr
+        self.__properties = properties # type: ignore (we know how to use this private attribute) # noqa: F821
+
+    
+    
+    @property
+    def query(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("query"))
+    
+    @property
+    def reason(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("reason"))
+    
+    
+
+
+class WriteFileToolAst:
+    def __init__(self, tb: type_builder.TypeBuilder):
+        _tb = tb._tb # type: ignore (we know how to use this private attribute)
+        self._bldr = _tb.class_("WriteFileTool")
+        self._properties: typing.Set[str] = set([  "file_path",  "content",  "reason",  ])
+        self._props = WriteFileToolProperties(self._bldr, self._properties)
+
+    def type(self) -> baml_py.FieldType:
+        return self._bldr.field()
+
+    @property
+    def props(self) -> "WriteFileToolProperties":
+        return self._props
+
+
+class WriteFileToolViewer(WriteFileToolAst):
+    def __init__(self, tb: type_builder.TypeBuilder):
+        super().__init__(tb)
+
+    
+    def list_properties(self) -> typing.List[typing.Tuple[str, type_builder.ClassPropertyViewer]]:
+        return [(name, type_builder.ClassPropertyViewer(self._bldr.property(name))) for name in self._properties]
+    
+
+
+class WriteFileToolProperties:
+    def __init__(self, bldr: baml_py.ClassBuilder, properties: typing.Set[str]):
+        self.__bldr = bldr
+        self.__properties = properties # type: ignore (we know how to use this private attribute) # noqa: F821
+
+    
+    
+    @property
+    def file_path(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("file_path"))
+    
+    @property
+    def content(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("content"))
+    
+    @property
+    def reason(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("reason"))
     
     
 
